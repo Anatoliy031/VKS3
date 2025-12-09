@@ -306,11 +306,12 @@ def parse_energy_service_report(path: str) -> dict:
 def main():
     ensure_dirs()
     # Paths to input files relative to the data directory.
-    report_path = os.path.join(DATA_DIR, 'Доклад.docx')
-    plan_fact_path = os.path.join(DATA_DIR, 'Выручка (план, факт).xlsx')
-    planned_revenue_path = os.path.join(DATA_DIR, 'Планируемая_выручка.xlsx')
-    vols_presentation_path = os.path.join(DATA_DIR, 'Динамика ВОЛС.PDF')
-    energy_service_path = os.path.join(DATA_DIR, 'Отчет ДУ ЭС на 05.12.2025.xlsx')
+    # Use simplified Latin filenames to avoid issues with non-Latin characters, spaces and punctuation.
+    report_path = os.path.join(DATA_DIR, 'report.docx')
+    plan_fact_path = os.path.join(DATA_DIR, 'planfact.xlsx')
+    planned_revenue_path = os.path.join(DATA_DIR, 'planrevenue.xlsx')
+    vols_presentation_path = os.path.join(DATA_DIR, 'vols.pdf')
+    energy_service_path = os.path.join(DATA_DIR, 'energy.xlsx')
 
     # Read documents and produce JSON.
     short_report = read_short_report(report_path)
