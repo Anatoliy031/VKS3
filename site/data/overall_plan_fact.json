@@ -1,0 +1,30 @@
+{
+  "2025 год": {
+    "plan": 1426548.0,
+    "fact": 1246564.0,
+    "percent_of_plan": 87.0,
+    "cash_receipts": 800239.0,
+    "difference": -179984.0
+  },
+  "2 полугодие 2025": {
+    "plan": 795492.0,
+    "fact": 479764.0,
+    "percent_of_plan": 60.0,
+    "cash_receipts": 344155.0,
+    "difference": -315728.0
+  },
+  "четвертый квартал": {
+    "plan": 438855.0,
+    "fact": 18583.0,
+    "percent_of_plan": 4.0,
+    "cash_receipts": 73492.0,
+    "difference": -420272.0
+  },
+  "октябрь 2025": {
+    "plan": 146285.0,
+    "fact": 18583.0,
+    "percent_of_plan": 13.0,
+    "cash_receipts": null,
+    "difference": -127702.0
+  }
+}

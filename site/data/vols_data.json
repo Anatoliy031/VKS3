@@ -1,0 +1,61 @@
+{
+  "plan_fact": {
+    "Факт 1 кв. 2025": {
+      "poles": null,
+      "poles_percent": 29.43,
+      "plan_revenue": 70.8,
+      "fact_revenue": 94.0,
+      "revenue_percent": 133.0,
+      "difference": 23.200000000000003
+    },
+    "Факт 2 кв. 2025": {
+      "poles": null,
+      "poles_percent": 34.49,
+      "plan_revenue": 98.3,
+      "fact_revenue": 137.0,
+      "revenue_percent": 139.0,
+      "difference": 38.7
+    },
+    "Факт п/г 2025": {
+      "poles": null,
+      "poles_percent": 34.49,
+      "plan_revenue": 169.1,
+      "fact_revenue": 231.0,
+      "revenue_percent": 137.0,
+      "difference": 61.900000000000006
+    },
+    "Факт 3 кв. 2025": {
+      "poles": null,
+      "poles_percent": 37.66,
+      "plan_revenue": 98.3,
+      "fact_revenue": 144.0,
+      "revenue_percent": 146.0,
+      "difference": 45.7
+    },
+    "Прогноз 4 кв. 2025": {
+      "poles": null,
+      "poles_percent": 38.06,
+      "plan_revenue": 125.7,
+      "fact_revenue": 105.0,
+      "revenue_percent": 84.0,
+      "difference": -20.700000000000003
+    },
+    "План 2025": {
+      "poles": null,
+      "poles_percent": 33.0,
+      "plan_revenue": 393.1,
+      "fact_revenue": 480.0,
+      "revenue_percent": 122.0,
+      "difference": 86.89999999999998
+    },
+    "План 2026": {
+      "poles": null,
+      "poles_percent": 40.0,
+      "plan_revenue": 473.5,
+      "fact_revenue": 480.0,
+      "revenue_percent": 101.0,
+      "difference": 6.5
+    }
+  },
+  "unauthorized": []
+}
