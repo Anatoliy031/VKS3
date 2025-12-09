@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ВКС — отчёт по нетарифным услугам</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-VnkZGtGpKh9g0qSAB76T6Z0MzY+RB9v9eIt7WQr2JKT5JkUDF+YFumV0RhiAiQ12"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        margin-bottom: 4rem;
+      }
+      .section {
+        margin-top: 2rem;
+      }
+      .chart-container {
+        position: relative;
+        height: 400px;
+        margin-top: 1rem;
+      }
+      table th,
+      table td {
+        vertical-align: middle;
+      }
+      .table-responsive {
+        max-height: 500px;
+        overflow-y: auto;
+      }
+
+      /* Print styles: hide the export buttons when printing */
+      @media print {
+        .print-hide {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="container">
+    <h1 class="mt-4">Отчёт по нетарифным услугам</h1>
+    <p class="text-muted">Автоматически сформированный сайт для еженедельных ВКС</p>
+
+    <!-- Export buttons -->
+    <div class="d-flex gap-2 mb-3 print-hide">
+      <button id="printBtn" class="btn btn-secondary">Печать</button>
+      <button id="downloadPdfBtn" class="btn btn-primary">Скачать PDF</button>
+    </div>
+
+    <!-- Краткий доклад -->
+    <div class="section" id="report-section">
+      <h2>1. Краткий доклад</h2>
+      <div id="report-content"></div>
+    </div>
+
+    <!-- Выручка план/факт -->
+    <div class="section" id="overall-plan-fact-section">
+      <h2>2. Выручка — план/факт</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="overall-table">
+          <thead>
+            <tr>
+              <th>Период</th>
+              <th>План (млн руб.)</th>
+              <th>Факт (млн руб.)</th>
+              <th>Отклонение</th>
+              <th>% выполнения</th>
+              <th>Поступления (млн руб.)</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="chart-container">
+        <canvas id="overall-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Планируемая выручка по филиалам -->
+    <div class="section" id="branch-plan-section">
+      <h2>3. Планируемая выручка по филиалам</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="branch-table">
+          <thead>
+            <tr>
+              <th>Филиал</th>
+              <th>Бизнес‑план</th>
+              <th>Факт</th>
+              <th>Отклонение</th>
+              <th>% выполнения</th>
+              <th>Ожидаемый факт</th>
+              <th>Ожидаемый %</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="chart-container">
+        <canvas id="branch-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- ВОЛС: показатели и динамика -->
+    <div class="section" id="vols-section">
+      <h2>4. ВОЛС — показатели и динамика</h2>
+      <h3>4.1 План/факт по размещению ВОЛС на ВЛ</h3>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="vols-plan-table">
+          <thead>
+            <tr>
+              <th>Период</th>
+              <th>Опоры (шт.)</th>
+              <th>Доля подвеса (%)</th>
+              <th>Выручка план</th>
+              <th>Выручка факт</th>
+              <th>Отклонение</th>
+              <th>% выполнения выручки</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="chart-container">
+        <canvas id="vols-plan-chart"></canvas>
+      </div>
+
+      <h3 class="mt-4">4.2 Динамика бездоговорного размещения</h3>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="unauthorized-table">
+          <thead>
+            <tr>
+              <th>Филиал</th>
+              <th>Предыдущее</th>
+              <th>Текущее</th>
+              <th>Δ</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- АО «Энергосервис-Кубани» -->
+    <div class="section" id="energy-service-section">
+      <h2>5. Выручка АО «Энергосервис‑Кубани»</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped" id="energy-table">
+          <thead>
+            <tr>
+              <th>Категория</th>
+              <th>Период</th>
+              <th>План</th>
+              <th>Факт</th>
+              <th>Отклонение</th>
+              <th>% выполнения</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="chart-container">
+        <canvas id="energy-chart"></canvas>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaCexLmSu/YVdrgA+8CKsVzL/TcKy/OsUW3T8i5vNwGXcAO9Wf8nBzLEYvxEi0E/pouzzH1YaFUBFN3y+Kk7g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-RR4kxBtLsg4tn88J5YBTHuLHswPSOHkqLlV6KQ5s5bGmDTdjHkSl1L74i0EsLG5KStixM30nmcjkOKMpuW1/6w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      async function loadJSON(path) {
+        const response = await fetch(path);
+        return response.json();
+      }
+
+      // 1. Load and render short report
+      loadJSON('data/report_summary.json').then((data) => {
+        const container = document.getElementById('report-content');
+        data.paragraphs.forEach((p) => {
+          const para = document.createElement('p');
+          para.textContent = p;
+          container.appendChild(para);
+        });
+      });
+
+      // 2. Overall plan/fact table and chart
+      loadJSON('data/overall_plan_fact.json').then((data) => {
+        const tbody = document.querySelector('#overall-table tbody');
+        const labels = [];
+        const planData = [];
+        const factData = [];
+        const diffData = [];
+        Object.entries(data).forEach(([period, values]) => {
+          labels.push(period);
+          planData.push(values.plan);
+          factData.push(values.fact);
+          diffData.push(values.difference);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${period}</td>
+            <td>${values.plan?.toLocaleString('ru-RU')}</td>
+            <td>${values.fact?.toLocaleString('ru-RU')}</td>
+            <td>${values.difference?.toLocaleString('ru-RU')}</td>
+            <td>${values.percent_of_plan != null ? values.percent_of_plan + '%' : ''}</td>
+            <td>${values.cash_receipts != null ? values.cash_receipts.toLocaleString('ru-RU') : ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        const ctx = document.getElementById('overall-chart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'План',
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                data: planData,
+              },
+              {
+                label: 'Факт',
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                data: factData,
+              },
+              {
+                label: 'Отклонение',
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                data: diffData,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top' },
+              title: {
+                display: true,
+                text: 'План vs Факт (выручка)'
+              }
+            },
+          },
+        });
+      });
+
+      // 3. Planned revenue by branch
+      loadJSON('data/planned_by_branch.json').then((data) => {
+        const tbody = document.querySelector('#branch-table tbody');
+        const labels = [];
+        const planData = [];
+        const factData = [];
+        data.forEach((row) => {
+          labels.push(row.filial);
+          planData.push(row.business_plan);
+          factData.push(row.fact);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row.filial}</td>
+            <td>${row.business_plan?.toLocaleString('ru-RU')}</td>
+            <td>${row.fact?.toLocaleString('ru-RU')}</td>
+            <td>${row.fact_diff?.toLocaleString('ru-RU')}</td>
+            <td>${row.fact_pct?.toFixed(1)}%</td>
+            <td>${row.expected_fact != null ? row.expected_fact.toLocaleString('ru-RU') : ''}</td>
+            <td>${row.expected_pct != null ? row.expected_pct + '%' : ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        const ctx = document.getElementById('branch-chart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Бизнес‑план',
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                data: planData,
+              },
+              {
+                label: 'Факт',
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                data: factData,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            indexAxis: 'y',
+            plugins: {
+              legend: { position: 'top' },
+              title: {
+                display: true,
+                text: 'План vs Факт по филиалам'
+              }
+            },
+          },
+        });
+      });
+
+      // 4. VOLS metrics
+      loadJSON('data/vols_data.json').then((data) => {
+        // Plan/fact
+        const planData = data.plan_fact;
+        const tbody = document.querySelector('#vols-plan-table tbody');
+        const labels = [];
+        const planRevenue = [];
+        const factRevenue = [];
+        Object.entries(planData).forEach(([period, val]) => {
+          labels.push(period);
+          planRevenue.push(val.plan_revenue);
+          factRevenue.push(val.fact_revenue);
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${period}</td>
+            <td>${val.poles?.toLocaleString('ru-RU')}</td>
+            <td>${val.poles_percent?.toFixed(2)}%</td>
+            <td>${val.plan_revenue?.toLocaleString('ru-RU')}</td>
+            <td>${val.fact_revenue?.toLocaleString('ru-RU')}</td>
+            <td>${val.difference?.toLocaleString('ru-RU')}</td>
+            <td>${val.revenue_percent != null ? val.revenue_percent + '%' : ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        const ctx = document.getElementById('vols-plan-chart').getContext('2d');
+        new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Плановая выручка',
+                borderColor: 'rgba(54, 162, 235, 0.8)',
+                backgroundColor: 'rgba(54, 162, 235, 0.3)',
+                data: planRevenue,
+                tension: 0.3,
+              },
+              {
+                label: 'Фактическая выручка',
+                borderColor: 'rgba(75, 192, 192, 0.8)',
+                backgroundColor: 'rgba(75, 192, 192, 0.3)',
+                data: factRevenue,
+                tension: 0.3,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top' },
+              title: {
+                display: true,
+                text: 'Выручка по ВОЛС — план и факт'
+              }
+            },
+          },
+        });
+        // Unauthorized dynamics
+        const unauthBody = document.querySelector('#unauthorized-table tbody');
+        data.unauthorized.forEach((row) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row.filial}</td>
+            <td>${row.previous.toLocaleString('ru-RU')}</td>
+            <td>${row.current.toLocaleString('ru-RU')}</td>
+            <td>${row.delta >= 0 ? '+' : ''}${row.delta.toLocaleString('ru-RU')}</td>
+          `;
+          unauthBody.appendChild(tr);
+        });
+      });
+
+      // 5. Energy service (АО «Энергосервис-Кубани»)
+      loadJSON('data/energy_service.json').then((data) => {
+        const tbody = document.querySelector('#energy-table tbody');
+        const categories = Object.keys(data);
+        const periodSet = new Set();
+        categories.forEach((cat) => {
+          Object.keys(data[cat]).forEach((p) => periodSet.add(p));
+        });
+        const periods = Array.from(periodSet);
+        // Build chart datasets
+        const datasets = [];
+        const colors = {
+          total: 'rgba(54, 162, 235, 0.6)',
+          non_tariff: 'rgba(255, 206, 86, 0.6)',
+        };
+        categories.forEach((cat) => {
+          const values = [];
+          periods.forEach((p) => {
+            const obj = data[cat][p] || {};
+            values.push(obj.fact || null);
+            // Build table rows
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${cat === 'total' ? 'Всего по обществу' : 'Нетарифные услуги'}</td>
+              <td>${p}</td>
+              <td>${obj.plan != null ? obj.plan.toLocaleString('ru-RU') : ''}</td>
+              <td>${obj.fact != null ? obj.fact.toLocaleString('ru-RU') : ''}</td>
+              <td>${obj.difference != null ? obj.difference.toLocaleString('ru-RU') : ''}</td>
+              <td>${obj.percent_of_plan != null ? obj.percent_of_plan.toFixed(2) + '%' : ''}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+          datasets.push({
+            label: cat === 'total' ? 'Всего' : 'Нетарифные',
+            backgroundColor: colors[cat],
+            data: values,
+          });
+        });
+        const ctx = document.getElementById('energy-chart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: periods,
+            datasets: datasets,
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top' },
+              title: {
+                display: true,
+                text: 'АО «Энергосервис‑Кубани»: выручка план/факт'
+              }
+            },
+          },
+        });
+      });
+
+      // Export functionality
+      document.getElementById('printBtn').addEventListener('click', () => {
+        window.print();
+      });
+
+      document.getElementById('downloadPdfBtn').addEventListener('click', async () => {
+        // Convert the entire document to canvas
+        const element = document.body;
+        const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        // Calculate dimensions to fit A4
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * pageWidth) / canvas.width;
+        let y = 0;
+        // If the content overflows a single page, add multiple pages
+        if (imgHeight < pageHeight) {
+          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+        } else {
+          let position = 0;
+          while (position < imgHeight) {
+            pdf.addImage(imgData, 'PNG', 0, position ? -position : 0, imgWidth, imgHeight);
+            position += pageHeight;
+            if (position < imgHeight) pdf.addPage();
+          }
+        }
+        pdf.save('otchet.pdf');
+      });
+    </script>
+  </body>
+</html>
